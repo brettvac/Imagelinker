@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fieldset name="imagelinker" label="imagelinkerLabel">
+        <field
+            name="case_sensitive"
+            type="checkbox"
+            label="COM_IMAGELINKER_CASE_SENSITIVE"
+            description="COM_IMAGELINKER_CASE_SENSITIVE_DESC"
+            default="0"
+        />
+
+        <field
+            name="task"
+            type="hidden"
+            default=""
+        />
+
+        <field
+            name="token"
+            type="hidden"
+            default="1"
+        />
+
+        <field
+            name="unlinked_images"
+            type="list"
+            multiple="true"
+            label="COM_IMAGELINKER_UNLINKED_IMAGES"
+            description="COM_IMAGELINKER_UNLINKED_IMAGES_DESC"
+            class="inputbox"
+        >
+            <option value="">COM_IMAGELINKER_SELECT_UNLINKED_IMAGES</option>
+        </field>
+
+        <field
+            name="folders"
+            type="checkboxes"
+            label="COM_IMAGELINKER_FOLDERS_TO_SCAN"
+            description="COM_IMAGELINKER_FOLDERS_TO_SCAN_DESC"
+            class="inputbox"
+            default=""
+        >
+            <option value="">COM_IMAGELINKER_NO_FOLDERS_AVAILABLE</option>
+        </field>
+    </fieldset>
+</form>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <fieldset name="general" label="COM_IMAGELINKER_CONFIG_GENERAL_SETTINGS">
+        <field
+            name="media_directory"
+            type="text"
+            label="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_LABEL"
+            description="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_DESCRIPTION"
+            default="images"
+            filter="path"
+            size="50"
+        />
+    </fieldset>
+    <fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+    </fieldset>
+</config>
