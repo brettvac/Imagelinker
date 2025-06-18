@@ -2,7 +2,7 @@
 ![Image Linker Component Logo](images/logo.jpg)
 A Joomla! component for scanning and fixing broken image links in articles by matching them to files in the media folder.
 
-Are you tired of broken image links in your Joomla! articles? This component scans your articles, identifies missing images, and suggests replacements from your media folder, making it easy to keep your content polished.
+Are you tired of images cluttering up your media folder? This component scans your content, identifies missing images, and displays unlinked images, making it easy to keep your files tidy.
 
 ## How To Use Image Linker Component
 1. Install the component via the Joomla! Extensions Manager. You can install via URL by using this URL: [https://github.com/brettvac/imagelinker/releases/download/1.0/com_imagelinker.zip](https://github.com/brettvac/imagelinker/releases/download/1.0/com_imagelinker.zip)
