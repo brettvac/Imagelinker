@@ -19,15 +19,17 @@ class DisplayController extends BaseController
     public function display($cachable = false, $urlparams = false)
     {
         $viewName = $this->input->get('view', $this->default_view);
+        
         $viewLayout = $this->input->get('layout', 'default');
+        
+        $viewType = Factory::getDocument()->getType();
 
-        $view = $this->getView($viewName, Factory::getDocument()->getType(), 'Administrator');
+        $view = $this->getView($viewName, $viewType, 'Administrator');
+        
         $model = $this->getModel('Imagelinker', 'Administrator');
 
-        if ($model)
-        {
-            $view->setModel($model, true);
-        }
+        // the View needs a pointer to the Model
+        $view->setModel($model, true);
 
         $view->setLayout($viewLayout);
         $view->display();
