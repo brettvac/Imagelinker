@@ -31,6 +31,14 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                                     <h4><?php echo Text::_('COM_IMAGELINKER_FOLDERS_TO_SCAN'); ?></h4>
                                     <p class="text-muted"><?php echo Text::_('COM_IMAGELINKER_FOLDERS_TO_SCAN_DESC'); ?></p>
 
+                                    <!-- Toggle All Checkbox -->
+                                    <div class="form-check">
+                                      <input type="checkbox" class="form-check-input" id="toggle-all-folders" checked="checked" onclick="document.querySelectorAll('input[name=\'jform[folders][]\']').forEach(checkbox => checkbox.checked = this.checked);">
+                                       <label class="form-check-label" for="toggle-all-folders">
+                                        <?php echo Text::_('COM_IMAGELINKER_TOGGLE_ALL_FOLDERS'); ?>
+                                      </label>
+                                    </div>
+
                                     <div class="form-group">
                                         <div class="controls">
                                             <?php if (!empty($this->mediaFolders)): ?>
