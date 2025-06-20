@@ -24,7 +24,15 @@ class ImagelinkerModel extends AdminModel
 {
     protected $unlinkedImages = [];
 
-    protected function getReferencedImages(bool $caseSensitive = false)
+    /**
+     * Scans various database tables (e.g., #__content, #__modules, #__categories) for image references
+     * in content and JSON fields.Returns a list of unique image paths relative to JPATH_ROOT.
+     *
+     * @param   bool  $caseSensitive  Whether to return paths in a case-sensitive manner for comparison.
+     * @return  array  List of unique image paths relative to JPATH_ROOT (e.g., 'images/sample.jpg').
+     * @throws  \RuntimeException  If a database query fails.
+     */
+    protected function getReferencedImages(bool $caseSensitive = false): array
     {
         $db = $this->getDbo();
         $app = Factory::getApplication();
@@ -55,6 +63,7 @@ class ImagelinkerModel extends AdminModel
             $articles = $db->loadObjectList();
 
             foreach ($articles as $article) {
+                // Scan introtext and fulltext for <img> tags
                 $texts = [$article->introtext, $article->fulltext];
                 foreach ($texts as $text) {
                     preg_match_all(
@@ -63,15 +72,20 @@ class ImagelinkerModel extends AdminModel
                         $matches,
                     );
                     foreach ($matches[1] as $src) {
-                        $addImage($src);
+                        // Strip #joomlaImage:// and anything after it
+                        $cleanSrc = strtok($src, "#");
+                        $addImage($cleanSrc);
                     }
                 }
 
+                // Parse images field (JSON)
                 $imagesField = json_decode((string) $article->images, true);
                 if (is_array($imagesField)) {
                     foreach (["image_intro", "image_fulltext"] as $field) {
                         if (!empty($imagesField[$field])) {
-                            $addImage($imagesField[$field]);
+                            // Strip #joomlaImage:// and anything after it
+                            $cleanImage = strtok($imagesField[$field], "#");
+                            $addImage($cleanImage);
                         }
                     }
                 }
@@ -87,7 +101,7 @@ class ImagelinkerModel extends AdminModel
         try {
             $query = $db
                 ->getQuery(true)
-                ->select($db->quoteName("content"))
+                ->select($db->quoteName(["content", "params"]))
                 ->from($db->quoteName("#__modules"))
                 ->where(
                     $db->quoteName("module") . " = " . $db->quote("mod_custom"),
@@ -96,13 +110,26 @@ class ImagelinkerModel extends AdminModel
             $modules = $db->loadObjectList();
 
             foreach ($modules as $module) {
+                // Scan content for <img> tags
                 preg_match_all(
                     '/<img[^>]+src=["\'](.*?)["\']/i',
                     (string) $module->content,
                     $matches,
                 );
                 foreach ($matches[1] as $src) {
-                    $addImage($src);
+                    // Strip #joomlaImage:// and anything after it
+                    $cleanSrc = strtok($src, "#");
+                    $addImage($cleanSrc);
+                }
+
+                // Parse params field for background image
+                $params = json_decode((string) $module->params, true);
+                if (is_array($params) && !empty($params["backgroundimage"])) {
+                    // Strip #joomlaImage:// and anything after it
+                    $bgImage = strtok($params["backgroundimage"], "#");
+                    if ($bgImage) {
+                        $addImage($bgImage);
+                    }
                 }
             }
         } catch (\RuntimeException $e) {
@@ -332,6 +359,36 @@ class ImagelinkerModel extends AdminModel
             );
         }
 
+        // 11. Scan #__template_styles (template logo images)
+        try {
+            $query = $db
+                ->getQuery(true)
+                ->select($db->quoteName("params"))
+                ->from($db->quoteName("#__template_styles"));
+            $db->setQuery($query);
+            $templates = $db->loadObjectList();
+
+            foreach ($templates as $template) {
+                $params = json_decode((string) $template->params, true);
+                if (is_array($params) && !empty($params["logoFile"])) {
+                    // Strip #joomlaImage:// and anything after it
+                    $logoImage = strtok($params["logoFile"], "#");
+                    if ($logoImage) {
+                        $addImage($logoImage);
+                    }
+                }
+            }
+        } catch (\RuntimeException $e) {
+            $app->enqueueMessage(
+                Text::sprintf(
+                    "COM_IMAGELINKER_ERROR_QUERY_FAILED",
+                    "template styles",
+                    $e->getMessage(),
+                ),
+                "error",
+            );
+        }
+
         // Remove duplicates and return
         return array_unique($referencedImages);
     }
@@ -346,7 +403,7 @@ class ImagelinkerModel extends AdminModel
     public function scanForUnlinkedImages(
         array $selectedFolders = [],
         bool $caseSensitive = false,
-    ) {
+    ): array|false {
         $app = Factory::getApplication();
         $this->unlinkedImages = [];
 
@@ -498,7 +555,7 @@ class ImagelinkerModel extends AdminModel
             if (is_dir($fullPath)) {
                 // $file is already a full absolute path
                 foreach (
-                    Folder::files($fullPath, ".", true, true)
+                    Folder::files($fullPath, ".", false, true) // Don't scan subdirectories; return full absolute path
                     as $fullFilePath
                 ) {
                     $fullFilePath = Path::clean($fullFilePath);
@@ -565,6 +622,7 @@ class ImagelinkerModel extends AdminModel
 
         // Dynamically populate folders field options
         $mediaFolders = $this->getMediaFolders();
+
         if (!empty($mediaFolders)) {
             $options = [];
             foreach ($mediaFolders as $folder) {
