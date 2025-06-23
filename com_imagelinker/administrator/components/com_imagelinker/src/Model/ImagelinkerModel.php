@@ -26,7 +26,7 @@ class ImagelinkerModel extends AdminModel
 
     /**
      * Scans various database tables (e.g., #__content, #__modules, #__categories) for image references
-     * in content and JSON fields.Returns a list of unique image paths relative to JPATH_ROOT.
+     * in content and JSON fields. Returns a list of unique image paths relative to JPATH_ROOT.
      *
      * @param   bool  $caseSensitive  Whether to return paths in a case-sensitive manner for comparison.
      * @return  array  List of unique image paths relative to JPATH_ROOT (e.g., 'images/sample.jpg').
@@ -38,20 +38,6 @@ class ImagelinkerModel extends AdminModel
         $app = Factory::getApplication();
 
         $referencedImages = [];
-
-        // Helper function to add image to referencedImages
-        $addImage = function ($src) use (&$referencedImages, $caseSensitive) {
-            $cleanSrc = Path::clean("/" . ltrim($src, "/"));
-            if (
-                filter_var($cleanSrc, FILTER_VALIDATE_URL) &&
-                !str_starts_with($cleanSrc, Uri::root())
-            ) {
-                return;
-            }
-            $referencedImages[] = $caseSensitive
-                ? $cleanSrc
-                : strtolower($cleanSrc);
-        };
 
         // 1. Scan #__content (articles)
         try {
@@ -65,34 +51,41 @@ class ImagelinkerModel extends AdminModel
             foreach ($articles as $article) {
                 // Scan introtext and fulltext for <img> tags
                 $texts = [$article->introtext, $article->fulltext];
+
                 foreach ($texts as $text) {
                     preg_match_all(
                         '/<img[^>]+src=["\'](.*?)["\']/i',
                         (string) $text,
                         $matches,
                     );
+
                     foreach ($matches[1] as $src) {
-                        // Strip #joomlaImage:// and anything after it
-                        $cleanSrc = strtok($src, "#");
-                        $addImage($cleanSrc);
+                        $this->addReferencedImage(
+                            $src,
+                            $referencedImages,
+                            $caseSensitive,
+                        );
                     }
                 }
 
                 // Parse images field (JSON)
                 $imagesField = json_decode((string) $article->images, true);
+
                 if (is_array($imagesField)) {
                     foreach (["image_intro", "image_fulltext"] as $field) {
                         if (!empty($imagesField[$field])) {
-                            // Strip #joomlaImage:// and anything after it
-                            $cleanImage = strtok($imagesField[$field], "#");
-                            $addImage($cleanImage);
+                            $this->addReferencedImage(
+                                $imagesField[$field],
+                                $referencedImages,
+                                $caseSensitive,
+                            );
                         }
                     }
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -117,28 +110,26 @@ class ImagelinkerModel extends AdminModel
                     $matches,
                 );
                 foreach ($matches[1] as $src) {
-                    // Strip #joomlaImage:// and anything after it
-                    $cleanSrc = strtok($src, "#");
-                    $addImage($cleanSrc);
+                    $this->addReferencedImage(
+                        $src,
+                        $referencedImages,
+                        $caseSensitive,
+                    );
                 }
 
-                // Parse params field for background image
+                // Parse params field for module background image
                 $params = json_decode((string) $module->params, true);
                 if (is_array($params) && !empty($params["backgroundimage"])) {
-                    // Strip #joomlaImage:// and anything after it
-                    $bgImage = strtok($params["backgroundimage"], "#");
-                    if ($bgImage) {
-                        $addImage($bgImage);
-                    }
+                    $this->addReferencedImage(
+                        $params["backgroundimage"],
+                        $referencedImages,
+                        $caseSensitive,
+                    );
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::sprintf(
-                    "COM_IMAGELINKER_ERROR_QUERY_FAILED",
-                    "modules",
-                    $e->getMessage(),
-                ),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -154,17 +145,17 @@ class ImagelinkerModel extends AdminModel
 
             foreach ($categories as $category) {
                 $params = json_decode((string) $category->params, true);
-                if (is_array($params)) {
-                    foreach (["image", "image_alt"] as $field) {
-                        if (!empty($params[$field])) {
-                            $addImage($params[$field]);
-                        }
-                    }
+                if (is_array($params) && !empty($params['image'])) {
+                  $this->addReferencedImage(
+                  $params['image'],
+                  $referencedImages,
+                  $caseSensitive,
+                  );
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -180,12 +171,16 @@ class ImagelinkerModel extends AdminModel
 
             foreach ($contacts as $contact) {
                 if (!empty($contact->image)) {
-                    $addImage($contact->image);
+                    $this->addReferencedImage(
+                        $contact->image,
+                        $referencedImages,
+                        $caseSensitive,
+                    );
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -204,16 +199,17 @@ class ImagelinkerModel extends AdminModel
 
                 if (is_array($params)) {
                     if (!empty($params["imageurl"])) {
-                        $addImage($params["imageurl"]);
-                    }
-                    if (!empty($params["alt_image"])) {
-                        $addImage($params["alt_image"]);
+                        $this->addReferencedImage(
+                            $params["imageurl"],
+                            $referencedImages,
+                            $caseSensitive,
+                        );
                     }
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -232,14 +228,18 @@ class ImagelinkerModel extends AdminModel
                 if (is_array($imagesField)) {
                     foreach (["image_first", "image_second"] as $field) {
                         if (!empty($imagesField[$field])) {
-                            $addImage($imagesField[$field]);
+                            $this->addReferencedImage(
+                                $imagesField[$field],
+                                $referencedImages,
+                                $caseSensitive,
+                            );
                         }
                     }
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
@@ -255,48 +255,27 @@ class ImagelinkerModel extends AdminModel
 
             foreach ($menuItems as $menuItem) {
                 $params = json_decode((string) $menuItem->params, true);
-                if (is_array($params) && !empty($params["menu_image"])) {
-                    $addImage($params["menu_image"]);
+
+                if (is_array($params)) {
+                    foreach ($params as $key => $value) {
+                        if (str_ends_with($key, "_image") && !empty($value)) {
+                            $this->addReferencedImage(
+                                $value,
+                                $referencedImages,
+                                $caseSensitive,
+                            );
+                        }
+                    }
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
 
-        // 8. Scan #__fields_values (custom fields of type media)
-        try {
-            $query = $db
-                ->getQuery(true)
-                ->select($db->quoteName("fv.value"))
-                ->from($db->quoteName("#__fields_values", "fv"))
-                ->join(
-                    "INNER",
-                    $db->quoteName("#__fields", "f") .
-                        " ON " .
-                        $db->quoteName("f.id") .
-                        " = " .
-                        $db->quoteName("fv.field_id"),
-                )
-                ->where($db->quoteName("f.type") . " = " . $db->quote("media"));
-            $db->setQuery($query);
-            $fieldValues = $db->loadObjectList();
-
-            foreach ($fieldValues as $fieldValue) {
-                if (!empty($fieldValue->value)) {
-                    $addImage($fieldValue->value);
-                }
-            }
-        } catch (\RuntimeException $e) {
-            $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
-                "error",
-            );
-        }
-
-        // 9. Scan #__tags (tag images)
+        // 8. Scan #__tags (tag images)
         try {
             $query = $db
                 ->getQuery(true)
@@ -310,56 +289,52 @@ class ImagelinkerModel extends AdminModel
                 if (is_array($imagesField)) {
                     foreach (["image_intro", "image_fulltext"] as $field) {
                         if (!empty($imagesField[$field])) {
-                            $addImage($imagesField[$field]);
+                            $this->addReferencedImage(
+                                $imagesField[$field],
+                                $referencedImages,
+                                $caseSensitive,
+                            );
                         }
                     }
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
 
-        // 10. Scan #__users (user profile images)
+        // 9. Scan #__users (for user profile images in params)
         try {
             $query = $db
                 ->getQuery(true)
-                ->select(
-                    $db->quoteName(["user_id", "profile_key", "profile_value"]),
-                )
-                ->from($db->quoteName("#__user_profiles"))
-                ->where(
-                    $db->quoteName("profile_key") .
-                        " LIKE " .
-                        $db->quote("profile.%"),
-                );
-
+                ->select($db->quoteName("params"))
+                ->from($db->quoteName("#__users"));
             $db->setQuery($query);
-            $rows = $db->loadAssocList();
+            $users = $db->loadObjectList();
 
-            $profiles = [];
-            foreach ($rows as $row) {
-                $key = str_replace("profile.", "", $row["profile_key"]);
-                $value = json_decode($row["profile_value"], true);
-                $profiles[$row["user_id"]][$key] =
-                    $value === null ? $row["profile_value"] : $value;
-            }
+            foreach ($users as $user) {
+                $params = json_decode((string) $user->params, true);
 
-            foreach ($profiles as $userId => $profile) {
-                if (!empty($profile["picture"])) {
-                    $addImage($profile["picture"]);
+                // Check for and process the parameter (SEE TODO)
+                if (is_array($params) && !empty($params["profile_image"])) {
+                    //TODO: Replace with actual parameter if not 'profile_image'
+                    $this->addReferencedImage(
+                        $params["profile_image"],
+                        $referencedImages,
+                        $caseSensitive,
+                    );
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
+                Text::sprintf("COM_IMAGELINKER_DB_ERROR", $e->getMessage()),
                 "error",
             );
         }
 
-        // 11. Scan #__template_styles (template logo images)
+        // 10. Scan #__template_styles (template logo images)
         try {
             $query = $db
                 ->getQuery(true)
@@ -370,27 +345,59 @@ class ImagelinkerModel extends AdminModel
 
             foreach ($templates as $template) {
                 $params = json_decode((string) $template->params, true);
+
+                // Check for the logoFile parameter and process the image
                 if (is_array($params) && !empty($params["logoFile"])) {
-                    // Strip #joomlaImage:// and anything after it
-                    $logoImage = strtok($params["logoFile"], "#");
-                    if ($logoImage) {
-                        $addImage($logoImage);
-                    }
+                    $this->addReferencedImage(
+                        $params["logoFile"],
+                        $referencedImages,
+                        $caseSensitive,
+                    );
                 }
             }
         } catch (\RuntimeException $e) {
             $app->enqueueMessage(
-                Text::sprintf(
-                    "COM_IMAGELINKER_ERROR_QUERY_FAILED",
-                    "template styles",
-                    $e->getMessage(),
-                ),
+                Text::_("COM_IMAGELINKER_DB_ERROR") . $e->getMessage(),
                 "error",
             );
         }
 
         // Remove duplicates and return
         return array_unique($referencedImages);
+    }
+
+    /**
+     * Cleans and adds an image source to the referenced images array.
+     *
+     * @param   string  $src               The raw image source.
+     * @param   array   &$referencedImages The array of referenced images to add to.
+     * @param   bool    $caseSensitive     Whether to treat image paths as case-sensitive.
+     *
+     * @return  void
+     */
+    protected function addReferencedImage(
+        string $src,
+        array &$referencedImages,
+        bool $caseSensitive,
+    ): void {	
+        // Strip #joomlaImage:// suffix
+        $cleanSrc = strtok($src, "#");
+
+        // Do not add external images
+        if (
+            filter_var($cleanSrc, FILTER_VALIDATE_URL) &&
+            !str_starts_with($cleanSrc, Uri::root())
+        ) {
+            return;
+        }
+		
+		// Normalize images by prepending /
+        $cleanSrc = Path::clean("/" . ltrim($cleanSrc, "/"));
+		        
+        $referencedImages[] = $caseSensitive
+            ? $cleanSrc
+            : strtolower($cleanSrc);
+                        
     }
 
     /**
