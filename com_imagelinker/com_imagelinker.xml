@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" version="4.0" method="upgrade">
     <name>com_imagelinker</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <description>COM_IMAGELINKER_DESCRIPTION</description>
     <creationDate>2025-04-15</creationDate>
     <author>Brett Vachon</author>
@@ -30,6 +30,6 @@
     <scriptfile>script.php</scriptfile>
     
     <updateservers>
-        <server type="extension" priority="1" name="Imagelinker Updates">https://raw.githubusercontent.com/brettvac/imagelinker/refs/heads/main/update/updates.xml</server>
+        <server type="extension" priority="1" name="Image Linker Updates">https://raw.githubusercontent.com/brettvac/imagelinker/refs/heads/main/update/updates.xml</server>
     </updateservers>
 </extension>

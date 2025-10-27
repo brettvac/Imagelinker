@@ -1,6 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
+ * @version  1.1
  * @license  GNU General Public License version 2
  */
 
@@ -37,7 +38,6 @@ class HtmlView extends BaseHtmlView
         }
         
         // Get the list of unlinked images from the user state (populated by scan action)
-        //$this->unlinkedImages = Factory::getApplication()->getUserState('com_imagelinker.unlinked_images', []); 
         $data = Factory::getApplication()->getUserState('com_imagelinker.data', new \stdClass);
         $this->unlinkedImages = $data->unlinked_images ?? [];
 

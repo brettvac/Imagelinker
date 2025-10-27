@@ -1,6 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
+ * @version    1.1
  * @license  GNU General Public License version 2
  */
 
@@ -14,7 +15,7 @@ use Joomla\CMS\Language\Text;
 return new class () implements InstallerScriptInterface
 {
     private string $minimumJoomla = '4.4.0';
-    private string $minimumPhp    = '7.4.0';
+    private string $minimumPhp    = '7.2.5';
 
     public function install(InstallerAdapter $adapter): bool
     {

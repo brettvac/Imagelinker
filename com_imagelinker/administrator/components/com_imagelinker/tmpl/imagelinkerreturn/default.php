@@ -1,6 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
+ * @version  1.1
  * @license  GNU General Public License version 2
  */
 
@@ -17,14 +18,10 @@ use Joomla\CMS\Helper\MediaHelper;
 // Ensure necessary scripts are loaded for Joomla.submitform, which toolbar buttons typically use
 HTMLHelper::_('behavior.core');
 
-// No chosen.js needed for buttons, but fine if other selects use it.
-HTMLHelper::_('formbehavior.chosen', 'select');
-
 $unlinkedImages = $this->unlinkedImages ?? [];
 $listCount    = count($unlinkedImages);
 
 ?>
-
 <form action="<?php echo Route::_('index.php?option=com_imagelinker&view=imagelinkerreturn'); ?>" method="post" name="adminForm" id="adminForm">
     <div class="container-fluid">
         <div class="row">

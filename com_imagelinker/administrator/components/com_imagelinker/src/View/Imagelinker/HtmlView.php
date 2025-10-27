@@ -1,6 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
+ * @version  1.1
  * @license  GNU General Public License version 2
  */
 
@@ -38,6 +39,9 @@ class HtmlView extends BaseHtmlView
 
         // Get the list of media folders from the model
         $this->mediaFolders = $model->getMediaFolders();
+        if (empty($this->mediaFolders)) {
+            Factory::getApplication()->enqueueMessage(Text::_('COM_IMAGELINKER_NO_MEDIA_FOLDERS_FOUND'), 'error');
+        }
 
         $this->addToolbar();
         parent::display($tpl);

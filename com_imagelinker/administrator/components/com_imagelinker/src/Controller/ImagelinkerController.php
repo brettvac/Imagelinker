@@ -1,6 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
+ * @version  1.1
  * @license  GNU General Public License version 2
  */
 
@@ -40,20 +41,18 @@ class ImagelinkerController extends BaseController
         // Get the model
         $model = $this->getModel("Imagelinker", "Administrator");
 
-        // Get selected folders and case sensitivity from the form submission
+        // Get selected folders and ignore case flag from the form submission
         $jform = $this->input->get("jform", [], "array");
+               
         $selectedFolders = isset($jform["folders"])
             ? (array) $jform["folders"]
             : [];
-        $caseSensitive = isset($jform["case_sensitive"])
-            ? (bool) $jform["case_sensitive"]
+        $ignoreCase = isset($jform["ignore_case"])
+            ? (bool) $jform["ignore_case"]
             : false;
-
-        // Call the model's scan method
-        $unlinkedImages = $model->scanForUnlinkedImages(
-            $selectedFolders,
-            $caseSensitive,
-        );
+       
+        // Call the model's scan method with ignore case flag
+        $unlinkedImages = $model->scanForUnlinkedImages($selectedFolders, $ignoreCase);
 
         // Handle form data and user state
         if (is_array($unlinkedImages)) {
@@ -72,8 +71,8 @@ class ImagelinkerController extends BaseController
                 );
             } else {
                 $this->app->enqueueMessage(
-                    Text::_("COM_IMAGELINKER_SCAN_NO_BROKEN"),
-                    "warning",
+                    Text::_("COM_IMAGELINKER_NO_UNLINKED_IMAGES"),
+                    "notice",
                 );
             }
 
@@ -175,7 +174,7 @@ class ImagelinkerController extends BaseController
             );
         } else {
             $this->app->enqueueMessage(
-                Text::_("COM_IMAGELINKER_DELETE_NO_CHANGES"),
+                Text::_("COM_IMAGELINKER_NO_CHANGES"),
                 "warning",
             );
         }
