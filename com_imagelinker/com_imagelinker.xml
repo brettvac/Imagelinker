@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" version="4.0" method="upgrade">
     <name>com_imagelinker</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <description>COM_IMAGELINKER_DESCRIPTION</description>
     <creationDate>2025-04-15</creationDate>
     <author>Brett Vachon</author>

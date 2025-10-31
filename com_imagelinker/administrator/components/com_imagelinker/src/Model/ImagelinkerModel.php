@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.1
+ * @version  1.2
  * @license  GNU General Public License version 2
  */
 
@@ -316,8 +316,9 @@ class ImagelinkerModel extends ListModel
             return;
         }
 
-        // Normalize images by prepending /
+        // Normalize images by prepending / (slash)
         $cleanSrc = Path::clean('/' . ltrim($cleanSrc, '/'));
+                
         $referencedImages[] = $cleanSrc;
     }
 
@@ -332,38 +333,37 @@ class ImagelinkerModel extends ListModel
     public function scanForUnlinkedImages(array $selectedFolders = [], bool $ignoreCase = false): array|false
     {
         $app = Factory::getApplication();
-
         
-          // Always clean the selected folders
-          $cleanSelectedFolders = [];
-          foreach ($selectedFolders as $folder) {
-              $cleanSelectedFolders[] = Path::clean($folder);
+        // Always clean the selected folders
+        $cleanSelectedFolders = [];
+        foreach ($selectedFolders as $folder) {
+            $cleanSelectedFolders[] = Path::clean($folder);
+        }
+
+        $foldersToScan = $cleanSelectedFolders;
+
+        if (empty($foldersToScan)) {
+              $app->enqueueMessage(Text::_('COM_IMAGELINKER_NO_FOLDERS_SELECTED'), 'warning');
+              return false;
           }
 
-          $foldersToScan = $cleanSelectedFolders;
+          $allMediaImages = $this->getAllMediaImages($foldersToScan);
 
-          if (empty($foldersToScan)) {
-                $app->enqueueMessage(Text::_('COM_IMAGELINKER_NO_FOLDERS_SELECTED'), 'warning');
-                return false;
-            }
+          $referencedImages = $this->getReferencedImages();
+            
+          if ($ignoreCase) {
+              $loweredReferenced = array_map('strtolower', $referencedImages);
+              $unlinkedImages = array_values(array_filter(
+                  $allMediaImages,
+                  function ($img) use ($loweredReferenced) {
+                      return !in_array(strtolower($img), $loweredReferenced);
+                  }
+              ));
+          } else {
+              $unlinkedImages = array_values(array_diff($allMediaImages, $referencedImages));
+          }
 
-            $allMediaImages = $this->getAllMediaImages($foldersToScan);
-
-            $referencedImages = $this->getReferencedImages();
-
-            if ($ignoreCase) {
-                $loweredReferenced = array_map('strtolower', $referencedImages);
-                $unlinkedImages = array_values(array_filter(
-                    $allMediaImages,
-                    function ($img) use ($loweredReferenced) {
-                        return !in_array(strtolower($img), $loweredReferenced);
-                    }
-                ));
-            } else {
-                $unlinkedImages = array_values(array_diff($allMediaImages, $referencedImages));
-            }
-
-            return $unlinkedImages;
+          return $unlinkedImages;
     }
 
     /**
@@ -450,7 +450,7 @@ class ImagelinkerModel extends ListModel
                 foreach (Folder::files($fullPath, '.', false, true) as $fullFilePath) {
                     $fullFilePath = Path::clean($fullFilePath);
                     if (MediaHelper::isImage($fullFilePath)) {
-                        $relativeFilePath = Path::clean(substr($fullFilePath, strlen(JPATH_ROOT) + 1));
+                        $relativeFilePath = Path::clean(substr($fullFilePath, strlen(JPATH_ROOT)));
                         $allMediaFiles[] = $relativeFilePath;
                     }
                 }
