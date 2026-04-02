@@ -1,5 +1,5 @@
 # Image Linker Component
-Image Linker is a Joomla! Administrator component for scanning and fixing broken image links in articles by matching them to files in the media folder.
+Image Linker is a Joomla! Administrator component for scanning unlinked or broken images inside Joomla! components, helping keep unused files out of your media folder.
 
 ## Why Use The Image Linker Component
 Are you tired of unused images cluttering up your media folder and taking up space? 
