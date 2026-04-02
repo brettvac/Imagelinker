@@ -14,8 +14,8 @@ use Joomla\CMS\Language\Text;
 
 return new class () implements InstallerScriptInterface
 {
-    private string $minimumJoomla = '4.4.0';
-    private string $minimumPhp    = '7.2.5';
+    private string $minimumJoomla = '5.0.0';
+    private string $minimumPhp    = '8.1.0';
 
     public function install(InstallerAdapter $adapter): bool
     {

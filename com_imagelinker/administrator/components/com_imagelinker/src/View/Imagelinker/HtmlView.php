@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.2
+ * @version  1.3
  * @license  GNU General Public License version 2
  */
 
@@ -28,6 +28,7 @@ class HtmlView extends BaseHtmlView
             return false;
         }
 
+        // Get the form from the model
         $model = $this->getModel();
         $this->form = $model->getForm();
 
@@ -35,12 +36,6 @@ class HtmlView extends BaseHtmlView
         {
             Factory::getApplication()->enqueueMessage(Text::_('COM_IMAGELINKER_FORM_NOT_LOADED'), 'error');
             return false;
-        }
-
-        // Get the list of media folders from the model
-        $this->mediaFolders = $model->getMediaFolders();
-        if (empty($this->mediaFolders)) {
-            Factory::getApplication()->enqueueMessage(Text::_('COM_IMAGELINKER_NO_MEDIA_FOLDERS_FOUND'), 'error');
         }
 
         $this->addToolbar();

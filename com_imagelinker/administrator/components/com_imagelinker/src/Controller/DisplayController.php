@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version    1.2
+ * @version  1.3
  * @license  GNU General Public License version 2
  */
 

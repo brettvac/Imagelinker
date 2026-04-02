@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.2
+ * @version  1.3
  * @license  GNU General Public License version 2
  */
 
@@ -11,15 +11,15 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Layout\LayoutHelper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\MediaHelper;
 
-// Ensure necessary scripts are loaded for Joomla.submitform, which toolbar buttons typically use
+//For debugging
+use Joomla\CMS\Factory;
+
 HTMLHelper::_('behavior.core');
 
 $unlinkedImages = $this->unlinkedImages ?? [];
-$listCount    = count($unlinkedImages);
+$listCount      = count($unlinkedImages);
 
 ?>
 <form action="<?php echo Route::_('index.php?option=com_imagelinker&view=imagelinkerreturn'); ?>" method="post" name="adminForm" id="adminForm">
@@ -51,25 +51,21 @@ $listCount    = count($unlinkedImages);
                                         <th style="width: 1%;" class="text-center">
                                             <?php echo HTMLHelper::_('grid.checkall'); ?>
                                         </th>
-                                        <th style="width: 15%;"><?php echo Text::_('COM_IMAGELINKER_TABLE_HEADER_IMAGE_PREVIEW'); ?></th>
-                                        <th><?php echo Text::_('COM_IMAGELINKER_TABLE_HEADER_IMAGE_PATH'); ?></th>
+                                        <th style="width: 15%;"><?php echo Text::_('COM_IMAGELINKER_UNLINKED_IMAGE_PREVIEW'); ?></th>
+                                        <th><?php echo Text::_('COM_IMAGELINKER_UNLINKED_IMAGE_PATH'); ?></th>
                                     </tr>
                                 </thead>
                                 
                                 <tbody>
                                     <?php foreach ($unlinkedImages as $i => $image) : ?>
-                                        <?php
-                                        $imagePath = Uri::root() . ltrim($image, '/');
-                                        ?>
+                                        <?php $imagePath = Uri::root() . ltrim($image, '/'); ?>
                                         <tr>
                                             <td class="text-center">
                                                 <?php echo HTMLHelper::_('grid.id', $i, htmlspecialchars($image, ENT_QUOTES, 'UTF-8')); ?>
                                             </td>
                                             <td>
                                                 <?php if (MediaHelper::isImage($image)) : ?>
-                                                    <img src="<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" style="max-width: 150px; max-height: 100px; border: 1px solid #ddd; border-radius: 3px;" />
-                                                <?php else : ?>
-                                                    <span><?php echo Text::_('COM_IMAGELINKER_NO_PREVIEW_AVAILABLE'); ?></span>
+                                                    <img src="<?php echo $imagePath; ?>" alt="Preview <?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" style="max-width: 150px; border-radius: 3px;" />
                                                 <?php endif; ?>
                                             </td>
                                             <td>
