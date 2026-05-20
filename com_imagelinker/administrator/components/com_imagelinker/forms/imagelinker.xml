@@ -9,17 +9,7 @@
             label="COM_IMAGELINKER_FOLDERS_TO_SCAN"
             description="COM_IMAGELINKER_FOLDERS_TO_SCAN_DESC"
             default=""
-        >          
-        </field>
-
-        <field
-            name="ignore_case"
-            type="checkbox"
-            label="COM_IMAGELINKER_IGNORE_CASE"
-            description="COM_IMAGELINKER_IGNORE_CASE_DESC"
-            value="1"
-            checked="1"
         />
-        
+       
     </fieldset>
 </form>

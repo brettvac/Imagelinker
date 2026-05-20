@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.3
+ * @version  1.4
  * @license  GNU General Public License version 2
  */
 
@@ -32,8 +32,9 @@ class MediafoldersField extends CheckboxesField
         $params = ComponentHelper::getParams('com_imagelinker');
         $mediaDir = $params->get('media_directory', 'images');
         
+        // Set and clean the relative path for user output and full path for filesystem operations
         $basePath = Path::clean($mediaDir);
-        $fullPath = Path::clean(JPATH_ROOT . '/' . $basePath);
+        $fullPath = Path::clean(JPATH_ROOT . '/' . $mediaDir);
 
         $mediaFolders = [];
 
@@ -47,7 +48,7 @@ class MediafoldersField extends CheckboxesField
                 // Get the relative path from the Joomla root
                 $mediaFolders[] = Path::clean(substr($subfolder, strlen(JPATH_ROOT) + 1)); 
             }
-        }  
+        }
     
         // Populate folders field options array
         foreach ($mediaFolders as $folder) 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.3
+ * @version  1.4
  * @license  GNU General Public License version 2
  */
 
@@ -17,14 +17,15 @@ use Joomla\CMS\Factory;
 class HtmlView extends BaseHtmlView
 {
     protected $form;
-    protected $mediaFolders;
 
     public function display($tpl = null)
     {
-        $user = Factory::getApplication()->getIdentity() ?: Factory::getUser();
+        $app  = Factory::getApplication();
+        $user = $app->getIdentity();
+        
         if (!$user->authorise('core.manage', 'com_imagelinker'))
         {
-            Factory::getApplication()->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+            $app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
             return false;
         }
 
@@ -34,7 +35,7 @@ class HtmlView extends BaseHtmlView
 
         if (!$this->form)
         {
-            Factory::getApplication()->enqueueMessage(Text::_('COM_IMAGELINKER_FORM_NOT_LOADED'), 'error');
+            $app->enqueueMessage(Text::_('COM_IMAGELINKER_FORM_NOT_LOADED'), 'error');
             return false;
         }
 
@@ -46,7 +47,9 @@ class HtmlView extends BaseHtmlView
     {
         ToolbarHelper::title(Text::_('COM_IMAGELINKER'), 'image imagelinker');
 
-        $user = Factory::getApplication()->getIdentity() ?: Factory::getUser();
+        $app  = Factory::getApplication();
+        $user = $app->getIdentity();
+        
         if ($user->authorise('core.admin', 'com_imagelinker'))
         {
             ToolbarHelper::preferences('com_imagelinker', '500');

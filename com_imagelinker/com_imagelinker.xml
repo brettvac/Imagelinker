@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
     <name>com_imagelinker</name>
-    <version>1.3</version>
+    <version>1.4</version>
     <description>COM_IMAGELINKER_DESCRIPTION</description>
-    <creationDate>2025-04-15</creationDate>
-    <author>Brett Vachon</author>
-    <authorUrl>https://naftee.com</authorUrl>
+    <author>Brett</author>
+    <creationDate>2025-03-15</creationDate>
+    <copyright>2025-2026</copyright>
     <license>GNU General Public License version 2</license>
 
-    <namespace path="src">Naftee\Component\Imagelinker</namespace>
+    <namespace path="src">Naftee\Component\Imagelinker</namespace>    
+    
+    <scriptfile>script.php</scriptfile>
 
     <administration>
+    
         <menu>COM_IMAGELINKER</menu>
+        
         <files folder="administrator/components/com_imagelinker">
             <filename>config.xml</filename>
             <folder>forms</folder>
@@ -19,15 +23,17 @@
             <folder>src</folder>
             <folder>tmpl</folder>
         </files>
+        
         <languages folder="administrator/components/com_imagelinker/language">
            <language tag="en-GB">en-GB/com_imagelinker.ini</language>
            <language tag="en-GB">en-GB/com_imagelinker.sys.ini</language>
            <language tag="fr-FR">fr-FR/com_imagelinker.ini</language>
            <language tag="fr-FR">fr-FR/com_imagelinker.sys.ini</language>
         </languages>
+        
     </administration>
-    
-    <scriptfile>script.php</scriptfile>
+
+    <changelogurl>https://raw.githubusercontent.com/brettvac/imagelinker/refs/heads/main/update/changelog.xml</changelogurl>
     
     <updateservers>
         <server type="extension" priority="1" name="Image Linker Component Updates">https://raw.githubusercontent.com/brettvac/imagelinker/refs/heads/main/update/updates.xml</server>

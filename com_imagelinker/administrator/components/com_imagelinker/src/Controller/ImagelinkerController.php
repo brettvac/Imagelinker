@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.3
+ * @version  1.4
  * @license  GNU General Public License version 2
  */
 
@@ -27,50 +27,95 @@ class ImagelinkerController extends BaseController
     {
         // Check for a valid POST request token to prevent CSRF attacks
         if (!Session::checkToken()) {
+
             $this->app->enqueueMessage(Text::_("JINVALID_TOKEN"), "error");
             $this->setRedirect(Route::_("index.php?option=com_imagelinker&view=imagelinker", false));
+
+            return;
+        }
+
+        // Get selected folders from the form submission
+        $jform = $this->input->get("jform", [], "array");
+
+        $selectedFolders = [];
+
+        if (isset($jform["mediafolders"])) {
+            $selectedFolders = (array) $jform["mediafolders"];
+        }
+
+        // Stop if no folders were selected
+        if (empty($selectedFolders)) {
+
+            $this->app->enqueueMessage(
+                Text::_("COM_IMAGELINKER_NO_FOLDERS_SELECTED"),
+                "warning"
+            );
+
+            $this->setRedirect(Route::_("index.php?option=com_imagelinker&view=imagelinker", false));;
+
             return;
         }
 
         // Get the model
-        $model = $this->getModel("Imagelinker", "Administrator");
+        $model = $this->getModel(
+            "Imagelinker",
+            "Administrator"
+        );
 
-        // Get selected folders and ignore case flag from the form submission
-        $jform = $this->input->get("jform", [], "array");
-               
-        $selectedFolders = [];
-        if (isset($jform["mediafolders"])) {
-          $selectedFolders = (array) $jform["mediafolders"];
-        } 
+        // Scan for unlinked images and obtain status for all images in the media folder
+        $scanResults = $model->scanForUnlinkedImages($selectedFolders);
 
-        $ignoreCase = false;
-        if (isset($jform["ignore_case"])) {
-          $ignoreCase = (bool) $jform["ignore_case"];
+        $unlinkedImages = $scanResults['unlinked_images'];
+        $processedImages = $scanResults['processed_images'];
+
+        // Display any model errors/warnings
+        foreach ($model->getErrors() as $error) {
+
+            $this->app->enqueueMessage(
+                $error instanceof \Exception
+                    ? $error->getMessage()
+                    : $error,
+                "error"
+            );
         }
-       
-        // Call the model's scan method with the selected options from the form
-        $unlinkedImages = $model->scanForUnlinkedImages($selectedFolders, $ignoreCase);
 
-        // Populate the form data and set user state based on the results
-        if (is_array($unlinkedImages)) {
-            
-            $jform["unlinked_images"] = $unlinkedImages;
-            $this->app->setUserState("com_imagelinker.data", (object) $jform);        
+        // Store results in user state
+        $jform["unlinked_images"] = $unlinkedImages;
+        $jform['processed_images'] = $processedImages;
 
-            // Display message based on number of unlinked images found
-            $unlinkedCount = count($unlinkedImages);
-            if ($unlinkedCount > 0) {
-                $this->app->enqueueMessage(Text::sprintf("COM_IMAGELINKER_SCAN_SUCCESS", $unlinkedCount), "message");
-            } else {
-                $this->app->enqueueMessage(Text::_("COM_IMAGELINKER_NO_UNLINKED_IMAGES"), "notice");
-            }
+        $this->app->setUserState(
+            "com_imagelinker.data",
+            (object) $jform
+        );
 
-            // Redirect to imagelinkerReturn view on success
-            $this->setRedirect(Route::_("index.php?option=com_imagelinker&view=imagelinkerReturn", false));
+        // Display message based on results
+        $unlinkedCount = count($unlinkedImages);
+
+        if ($unlinkedCount > 0) {
+
+            $this->app->enqueueMessage(
+                Text::sprintf(
+                    "COM_IMAGELINKER_SCAN_SUCCESS",
+                    $unlinkedCount
+                ),
+                "message"
+            );
+
         } else {
-            // Redirect to default imagelinker view on error
-            $this->setRedirect(Route::_("index.php?option=com_imagelinker&view=imagelinker", false));
+
+            $this->app->enqueueMessage(
+                Text::_("COM_IMAGELINKER_NO_UNLINKED_IMAGES"),
+                "notice"
+            );
         }
+
+        // Redirect to results view
+        $this->setRedirect(
+            Route::_(
+                "index.php?option=com_imagelinker&view=imagelinkerReturn",
+                false
+            )
+        );
     }
 
     /**
@@ -89,9 +134,6 @@ class ImagelinkerController extends BaseController
             return;
         }
 
-        // Get the model
-        $model = $this->getModel("Imagelinker", "Administrator");
-
         // Get the cid[] array of image paths
         $cid = $this->input->get("cid", [], "array");
 
@@ -103,10 +145,20 @@ class ImagelinkerController extends BaseController
 
         // Initialize deletion counter
         $deletedCount = 0;
+        
+        // Get the model
+        $model = $this->getModel("Imagelinker", "Administrator");
 
         // Iterate over each image path and call model to delete
         foreach ($cid as $imagePath) {
+            
+            if (empty($imagePath)) {
+                $this->app->enqueueMessage(Text::_('COM_IMAGELINKER_DELETE_ERROR_NO_PATH'), 'error');
+                continue; // Skip invalid entries
+            }
+            
             $result = $model->deleteUnlinkedImage($imagePath);
+            
             if ($result === true) {
                $deletedCount++;
             }
@@ -118,18 +170,50 @@ class ImagelinkerController extends BaseController
         } else {
             $this->app->enqueueMessage(Text::_("COM_IMAGELINKER_NO_CHANGES"), "warning");
         }
-
-        // Update user state to remove processed images
-        $currentData = $this->app->getUserState("com_imagelinker.data", (object) []);
         
+        // Fetch and display model errors
+        $errors = $model->getErrors();
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
+                $this->app->enqueueMessage($error instanceof \Exception ? $error->getMessage() : $error, 'error');
+            }
+        }
+
+        // Update user state to remove deleted images
+        $currentData = $this->app->getUserState("com_imagelinker.data", (object) []);
+
+        // Update unlinked_images
         $unlinkedImages = [];
 
         if (isset($currentData->unlinked_images)) {
             $unlinkedImages = (array) $currentData->unlinked_images;
         }
-        
-        $unlinkedImages = array_values(array_diff($unlinkedImages, $cid));
-        $currentData->unlinked_images = $unlinkedImages;
+
+        $currentData->unlinked_images = array_values(
+            array_diff($unlinkedImages, $cid)
+        );
+
+        // Update processed_images
+        $processedImages = [];
+
+        if (isset($currentData->processed_images)) {
+            $processedImages = (array) $currentData->processed_images;
+        }
+
+        $currentData->processed_images = array_values(
+            array_filter(
+                $processedImages,
+                function ($image) use ($cid) {
+
+                    // Skip malformed entries safely
+                    if (!is_array($image) || !isset($image['path'])) {
+                        return true;
+                    }
+
+                    return !in_array($image['path'], $cid, true);
+                }
+            )
+        );      
         
         $this->app->setUserState("com_imagelinker.data", $currentData);
 

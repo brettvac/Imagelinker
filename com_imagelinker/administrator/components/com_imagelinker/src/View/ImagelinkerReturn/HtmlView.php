@@ -1,7 +1,7 @@
 <?php
 /**
  * @package  Imagelinker Component
- * @version  1.3
+ * @version  1.4
  * @license  GNU General Public License version 2
  */
 
@@ -13,34 +13,33 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
 
 class HtmlView extends BaseHtmlView
 {
     protected $unlinkedImages;
+    protected $processedImages;
+    protected $params;
 
     public function display($tpl = null)
     {
-        $user = Factory::getApplication()->getIdentity() ?: Factory::getUser();
+        $app  = Factory::getApplication();
+        $user = $app->getIdentity();
+        
         if (!$user->authorise('core.manage', 'com_imagelinker'))
         {
-            Factory::getApplication()->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+            $app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
             return false;
         }
-        
-        // Get the form from the model        
-        $model = $this->getModel();
-        $this->form = $model->getForm();
-
-        if (!$this->form)
-        {
-            Factory::getApplication()->enqueueMessage(Text::_('COM_IMAGELINKER_FORM_NOT_LOADED'), 'error');
-            return false;
-        }
-        
-        // Get the data from the user state (populated by the scan action)
-        $data = Factory::getApplication()->getUserState('com_imagelinker.data', new \stdClass);
+              
+        // Get the data from the user state (populated by the Controller's scan function)
+        $data = $app->getUserState('com_imagelinker.data', new \stdClass);
         $this->unlinkedImages = $data->unlinked_images ?? [];
-
+        $this->processedImages = $data->processed_images ?? [];
+        
+        // Fetch the configuration parameters inside config.xml
+        $this->params = ComponentHelper::getParams('com_imagelinker');
+        
         $this->addToolbar();
         parent::display($tpl);
     }
@@ -50,12 +49,6 @@ class HtmlView extends BaseHtmlView
         ToolbarHelper::title(Text::_('COM_IMAGELINKER_RESULTS_TITLE'), 'image imagelinker');
         
         ToolbarHelper::cancel('imagelinker.cancel', 'JTOOLBAR_CANCEL');
-
-        $user = Factory::getApplication()->getIdentity() ?: Factory::getUser();
-        if ($user->authorise('core.admin', 'com_imagelinker'))
-        {
-            ToolbarHelper::preferences('com_imagelinker', '500');
-        }
 
     }
 }
