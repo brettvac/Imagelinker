@@ -4,288 +4,118 @@
         <element>com_imagelinker</element>
         <type>component</type>
         <version>1.4</version>
-
         <addition>
-            <item>
-                <![CDATA[
-                Added granular location data inside the array returned by <pre>getReferencedImages()</pre>.
-                ]]>
-            </item>
-
+            <item><![CDATA[Added granular location data inside the array returned by <pre>getReferencedImages()</pre>.]]></item>
             <item>Added configuration options and language strings for the options to see all images in the result and scan inside the content for images outside of img tags.</item>
-
             <item>Added a new table column output to see the location and status of all images in the selected folder when the option is chosen in the configuration.</item>
-
-            <item>
-                <![CDATA[
-                Added a helper method to extract images from text content based on strict (img only tags) or permissive (anything resembling an image).
-                ]]>
-            </item>
-
+            <item><![CDATA[Added a helper method to extract images from text content based on strict (img only tags) or permissive (anything resembling an image).]]></item>
             <item>Implemented the option to allow for more permissive image scanning inside content, instead of only looking inside img tags.</item>
-
-            <item>
-                <![CDATA[
-                Added a check inside <pre>addReferencedImage()</pre> to make sure the URL represents an image before adding it to the array.
-                ]]>
-            </item>
+            <item><![CDATA[Added a check inside <pre>addReferencedImage()</pre> to make sure the URL represents an image before adding it to the array.]]></item>
         </addition>
-
         <change>
             <item>Moved the check for an empty form variable of folders to scan from the model into the controller.</item>
-
-            <item>
-                <![CDATA[
-                Removed the method <pre>getAllMediaImages()</pre> and moved the logic into <pre>scanForUnlinkedImages()</pre>.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Clarified the intent with the path manipulation inside the <pre>MediafoldersField</pre> class.
-                ]]>
-            </item>
-
+            <item><![CDATA[Removed the method <pre>getAllMediaImages()</pre> and moved the logic into <pre>scanForUnlinkedImages()</pre>.]]></item>
+            <item><![CDATA[Clarified the intent with the path manipulation inside the <pre>MediafoldersField</pre> class.]]></item>
             <item>Moved the check for an invalid entry from the model into the controller delete method.</item>
-
-            <item>
-                <![CDATA[
-                Modified the return value from the <pre>scanForUnlinkedImages()</pre> method to return an associative array of the unlinked images and the status of all images.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Set errors inside the model and only output error messages inside the controller view instead of using <pre>app->enqueueMessage()</pre> inside the model.
-                ]]>
-            </item>
-
+            <item><![CDATA[Modified the return value from the <pre>scanForUnlinkedImages()</pre> method to return an associative array of the unlinked images and the status of all images.]]></item>
+            <item><![CDATA[Set errors inside the model and only output error messages inside the controller view instead of using <pre>app->enqueueMessage()</pre> inside the model.]]></item>
             <item>Modified language strings for the preview and the directory to better align with the enhanced view.</item>
-
             <item>Removed the options from the return view toolbar because they affect the scan results.</item>
-
-            <item>
-                <![CDATA[
-                Applied the proper setting of the user state variable <pre>processed_images</pre> to remove a deleted image from the results in the view that shows all images.
-                ]]>
-            </item>
+            <item><![CDATA[Applied the proper setting of the user state variable <pre>processed_images</pre> to remove a deleted image from the results in the view that shows all images.]]></item>
         </change>
-
         <fix>
             <item>Removed the checked attribute from the input tag so the toggle all folders option defaults to unchecked like the other items in the form.</item>
-
             <item>Removed the fieldset rendering for the ignore case option inside the template file.</item>
-
             <item>Deleted the language string related to the form not being loaded since the check was removed.</item>
-
-            <item>
-                <![CDATA[
-                Removed the path cleaning from the <pre>scanForUnlinkedImages()</pre> method since paths are already clean.
-                ]]>
-            </item>
-
+            <item><![CDATA[Removed the path cleaning from the <pre>scanForUnlinkedImages()</pre> method since paths are already clean.]]></item>
             <item>Removed the duplicate value removal step from all media variables since files are already unique.</item>
-
             <item>Removed the option for case sensitive matching in the scan function and in the configuration options because Linux filesystems treat filenames with different casing as separate files.</item>
-
             <item>Removed the language strings related to case sensitive matching since files with incorrect casing are treated as broken images by the web server.</item>
-
-            <item>
-                <![CDATA[
-                Deleted the test for the empty form object inside the <pre>getForm()</pre> method.
-                ]]>
-            </item>
-
+            <item><![CDATA[Deleted the test for the empty form object inside the <pre>getForm()</pre> method.]]></item>
             <item>Simplified the template by removing the check for the empty form since the view file already checks and handles that condition.</item>
-
             <item>Removed the fallback check for user identity inside the view file and kept the modern Joomla! method of verifying user identity.</item>
-
-            <item>
-                <![CDATA[
-                Removed unused <pre>$mediafolders</pre> variable inside the view file.
-                ]]>
-            </item>
-
+            <item><![CDATA[Removed unused <pre>$mediafolders</pre> variable inside the view file.]]></item>
             <item>Removed the form retrieval in the return view file since data is handled directly from the user state.</item>
-
             <item>Removed the empty array fallback inside the template file when retrieving protected variables set inside the view.</item>
         </fix>
-
         <remove>
             <item>Removed the case sensitive matching configuration option.</item>
             <item>Removed unused language strings related to case sensitive matching.</item>
         </remove>
     </changelog>
-
     <changelog>
         <element>com_imagelinker</element>
         <type>component</type>
         <version>1.3</version>
-
         <addition>
             <item>Implemented a custom field for the output to show checkboxes and image data.</item>
-
             <item>Dynamically created image alt tags in the return view based on filenames.</item>
-
             <item>Added scanning support for schema content in Joomla 5.</item>
-
             <item>Added more detailed error messages in try/catch blocks.</item>
         </addition>
-
         <change>
-            <item>
-                <![CDATA[
-                Changed the model type to <pre>FormModel</pre> to better reflect its functionality.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Changed <pre>deleteUnlinkedImages()</pre> to <pre>deleteUnlinkedImage()</pre> to clarify that it only handles one file at a time.
-                ]]>
-            </item>
-
+            <item><![CDATA[Changed the model type to <pre>FormModel</pre> to better reflect its functionality.]]></item>
+            <item><![CDATA[Changed <pre>deleteUnlinkedImages()</pre> to <pre>deleteUnlinkedImage()</pre> to clarify that it only handles one file at a time.]]></item>
             <item>Clarified the component description.</item>
-
             <item>Removed the word "Component" from the component name.</item>
-
             <item>Changed the table header language string constants for better clarity.</item>
-
             <item>Updated all file versions to 1.3.</item>
-
             <item>Updated language strings and corrected French language string translations.</item>
-
             <item>Updated minimum PHP and Joomla! versions inside the installer script.</item>
-
             <item>Removed Joomla 4 support from the update server and changed the minimum Joomla! version to 5.0.0.</item>
         </change>
-
         <fix>
             <item>Fixed the manifest file by removing the unnecessary version attribute from the XML declaration.</item>
-
             <item>Fixed the update server to use an evergreen ZIP file link.</item>
-
             <item>Corrected the language string shown when folders are missing.</item>
-
-            <item>
-                <![CDATA[
-                Fixed the <pre>loadFormData()</pre> function to check if user state data exists before populating the form.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Implemented a custom field for the output to show checkboxes and image data.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Removed the <pre>getTable()</pre> method from the model since it was unnecessary.
-                ]]>
-            </item>
-
+            <item><![CDATA[Fixed the <pre>loadFormData()</pre> function to check if user state data exists before populating the form.]]></item>
+            <item><![CDATA[Implemented a custom field for the output to show checkboxes and image data.]]></item>
+            <item><![CDATA[Removed the <pre>getTable()</pre> method from the model since it was unnecessary.]]></item>
             <item>Corrected the form fields to properly handle the renderField method.</item>
-
             <item>Removed unused language string labels from the fieldset and form.</item>
-
-            <item>
-                <![CDATA[
-                Fixed the form output in the template files to use <pre>renderField()</pre> instead of iterating through the <pre>$form</pre> array and outputting HTML.
-                ]]>
-            </item>
-
+            <item><![CDATA[Fixed the form output in the template files to use <pre>renderField()</pre> instead of iterating through the <pre>$form</pre> array and outputting HTML.]]></item>
             <item>Improved the error message output when there is an error loading the media folder.</item>
-
-            <item>
-                <![CDATA[
-                Simplified the logic behind <pre>deleteUnlinkedImage()</pre> to return true/false.
-                ]]>
-            </item>
-
+            <item><![CDATA[Simplified the logic behind <pre>deleteUnlinkedImage()</pre> to return true/false.]]></item>
             <item>Removed the duplicate deletion failure error message from the controller.</item>
-
-            <item>
-                <![CDATA[
-                Replaced deprecated <pre>getDbo()</pre> calls with <pre>getDatabase()</pre>.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Removed the <pre>$unlinkedImages</pre> global variable since it only appeared in one method.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Improved the <pre>addReferencedImage()</pre> method to remove redundant statement handling valid URLs.
-                ]]>
-            </item>
-
-            <item>
-                <![CDATA[
-                Removed unused global variable <pre>$form</pre> in the return view file and renamed <pre>$brokenimages</pre> to <pre>$unlinkedimages</pre> for consistency.
-                ]]>
-            </item>
+            <item><![CDATA[Replaced deprecated <pre>getDbo()</pre> calls with <pre>getDatabase()</pre>.]]></item>
+            <item><![CDATA[Removed the <pre>$unlinkedImages</pre> global variable since it only appeared in one method.]]></item>
+            <item><![CDATA[Improved the <pre>addReferencedImage()</pre> method to remove redundant statement handling valid URLs.]]></item>
+            <item><![CDATA[Removed unused global variable <pre>$form</pre> in the return view file and renamed <pre>$brokenimages</pre> to <pre>$unlinkedimages</pre> for consistency.]]></item>
         </fix>
     </changelog>
-
     <changelog>
         <element>com_imagelinker</element>
         <type>component</type>
         <version>1.2</version>
-
         <fix>
-            <item>
-                <![CDATA[
-                Fixed comparison bug inside <pre>getAllMediaImages()</pre> by ensuring leading slashes are added correctly.
-                ]]>
-            </item>
-
+            <item><![CDATA[Fixed comparison bug inside <pre>getAllMediaImages()</pre> by ensuring leading slashes are added correctly.]]></item>
             <item>Applied minor code formatting improvements.</item>
         </fix>
     </changelog>
-
     <changelog>
         <element>com_imagelinker</element>
         <type>component</type>
         <version>1.1</version>
-
         <addition>
             <item>Added scanning support for Joomla 5 schema content.</item>
-
             <item>Added more detailed error messages in try/catch blocks.</item>
         </addition>
-
         <change>
-            <item>
-                <![CDATA[
-                Changed the controller type to <pre>BaseController</pre> and removed unused dependencies.
-                ]]>
-            </item>
-
+            <item><![CDATA[Changed the controller type to <pre>BaseController</pre> and removed unused dependencies.]]></item>
             <item>Moved file and folder handling to Joomla API version 2.</item>
-
             <item>Fixed, removed, and updated language strings.</item>
         </change>
-
         <fix>
             <item>Properly implemented case sensitivity checks in both the model and form.</item>
-
             <item>Properly displayed all subfolders inside media folders for scanning.</item>
-
             <item>Added checks and error output for missing media folders.</item>
-
             <item>Fixed update server file syntax.</item>
         </fix>
     </changelog>
-
     <changelog>
         <element>com_imagelinker</element>
         <type>component</type>
         <version>1.0</version>
-
         <addition>
             <item>Initial release of the Image Linker component.</item>
         </addition>
