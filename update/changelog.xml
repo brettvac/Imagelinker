@@ -6,6 +6,7 @@
         <version>1.4</version>
         <addition>
             <item><![CDATA[Added the <code>&amp;lt;changelogurl&amp;gt;</code> tag to the extension manifest XML so the extension version links to the changelog in the manage view.]]></item>
+            <item><![CDATA[Added granular location data inside the array returned by <pre>getReferencedImages()</pre>.]]></item>
             <item>Added configuration options and language strings for the options to see all images in the result and scan inside the content for images outside of img tags.</item>
             <item>Added a new table column output to see the location and status of all images in the selected folder when the option is chosen in the configuration.</item>
             <item><![CDATA[Added a helper method to extract images from text content based on strict (img only tags) or permissive (anything resembling an image).]]></item>
