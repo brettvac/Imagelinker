@@ -11,7 +11,7 @@
             <item>Removed an unused debugging import.</item>
         </change>
         <addition>
-            <item>Added the MVC component extension class in `src/Extension/ImagelinkerComponent.php`.</item>
+            <item><![CDATA[Added the MVC component extension class in <code>src/Extension/ImagelinkerComponent.php</code>.]]></item>
             <item>Added a toggle to select or deselect all folders.</item>
             <item>Added a toggle to select or deselect subfolders of currently selected folders.</item>
             <item>Added English and French language strings for the folder selection controls.</item>
