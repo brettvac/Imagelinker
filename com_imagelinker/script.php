@@ -1,8 +1,9 @@
 <?php
 /**
- * @package  Imagelinker Component
- * @version  1.4
- * @license  GNU General Public License version 2
+ * @package     Joomla.Administrator
+ * @subpackage  Imagelinker Component
+ * @version     1.5
+ * @license     GNU General Public License version 2
  */
 
 defined('_JEXEC') or die;

@@ -1,8 +1,9 @@
 <?php
 /**
- * @package  Imagelinker Component
- * @version  1.4
- * @license  GNU General Public License version 2
+ * @package     Joomla.Administrator
+ * @subpackage  Imagelinker
+ * @version     1.5
+ * @license     GNU General Public License version 2
  */
 
 \defined('_JEXEC') or die;
@@ -30,15 +31,38 @@ HTMLHelper::_('behavior.formvalidator');
                           id="adminForm"
                           class="form-validate">
 
+
                         <div class="fieldset-wrapper">
-                            <div class="form-check mb-3">
+                            <div class="form-check mb-2">
                                 <input type="checkbox"
                                        class="form-check-input"
                                        id="toggle-all-folders"
-                                       onclick="document.querySelectorAll('input[name=\'jform[mediafolders][]\']').forEach(cb => cb.checked = this.checked);">
+                                       onclick="document.querySelectorAll('input[name=\'jform[mediafolders][]\']').forEach(cb => cb.checked = this.checked); document.getElementById('toggle-subfolders').checked = this.checked;">
 
                                 <label class="form-check-label" for="toggle-all-folders">
                                     <?php echo Text::_('COM_IMAGELINKER_TOGGLE_ALL_FOLDERS'); ?>
+                                </label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       id="toggle-subfolders"
+                                       onclick="
+                                           const checkboxes = [...document.querySelectorAll('input[name=\'jform[mediafolders][]\']')];
+                                           const selectedFolders = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+
+                                           checkboxes.forEach(cb => {
+                                               const parent = cb.value.substring(0, cb.value.lastIndexOf('/'));
+
+                                               if (parent && selectedFolders.includes(parent)) {
+                                                   cb.checked = this.checked;
+                                               }
+                                           });
+                                       ">
+
+                                <label class="form-check-label" for="toggle-subfolders">
+                                    <?php echo Text::_('COM_IMAGELINKER_TOGGLE_SUBFOLDERS'); ?>
                                 </label>
                             </div>
 

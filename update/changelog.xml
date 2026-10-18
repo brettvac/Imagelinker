@@ -3,6 +3,31 @@
     <changelog>
         <element>com_imagelinker</element>
         <type>component</type>
+        <version>1.5</version>
+        <change>
+            <item>Updated the component extension class, namespace, and documentation blocks to follow Joomla conventions.</item>
+            <item>Restricted the minimum supported Joomla version to 4.4.</item>
+            <item>Improved XML and PHP code formatting.</item>
+            <item>Removed an unused debugging import.</item>
+        </change>
+        <addition>
+            <item>Added the MVC component extension class in `src/Extension/ImagelinkerComponent.php`.</item>
+            <item>Added a toggle to select or deselect all folders.</item>
+            <item>Added a toggle to select or deselect subfolders of currently selected folders.</item>
+            <item>Added English and French language strings for the folder selection controls.</item>
+            <item>Added component access permissions in access.xml.</item>
+        </addition>
+        <fix>
+            <item>Corrected subfolder selection so that only subfolders of selected parent folders are affected.</item>
+            <item>Corrected the PHP opening tag in the administrator view.</item>
+            <item>Ensured deletion checkboxes are available only for unlinked images, including when displaying all images.</item>
+            <item>Updated deletion success messages to accommodate singular and plural image counts.</item>
+            <item>Corrected and improved French translations.</item>
+        </fix>
+    </changelog>
+    <changelog>
+        <element>com_imagelinker</element>
+        <type>component</type>
         <version>1.4</version>
         <addition>
             <item><![CDATA[Added the <code>changelogurl</code> tag to the extension manifest XML so the extension version links to the changelog in the manage view.]]></item>

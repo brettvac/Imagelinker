@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
-    <fieldset name="imagelinker" 
-              addfieldprefix="Naftee\Component\Imagelinker\Administrator\Field">
-
-        <field
-            name="mediafolders"
-            type="mediafolders"
-            label="COM_IMAGELINKER_FOLDERS_TO_SCAN"
-            description="COM_IMAGELINKER_FOLDERS_TO_SCAN_DESC"
-            default=""
-        />
-       
+    <fieldset name="imagelinker" addfieldprefix="Naftee\Component\Imagelinker\Administrator\Field">
+        <field name="mediafolders" type="mediafolders" label="COM_IMAGELINKER_FOLDERS_TO_SCAN" description="COM_IMAGELINKER_FOLDERS_TO_SCAN_DESC" default="" />
     </fieldset>
 </form>

@@ -1,38 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
     <fieldset name="general" label="COM_IMAGELINKER_CONFIG_GENERAL_SETTINGS">
-    
-        <field
-            name="media_directory"
-            type="text"
-            label="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_LABEL"
-            description="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_DESCRIPTION"
-            default="images"
-            filter="path"
-            size="50"
-        />
-        
-        <field
-          name="only_img"
-          type="radio"
-          label="COM_IMAGELINKER_ONLY_IMG"
-          description="COM_IMAGELINKER_ONLY_IMG_DESC"
-          class="btn-group btn-group-yesno"
-          default="1"
-      >
-          <option value="1">JYES</option>
-          <option value="0">JNO</option>
-      </field>
-
-      <field
-          name="return_all"
-          type="checkbox"
-          label="COM_IMAGELINKER_RETURN_ALL"
-          description="COM_IMAGELINKER_RETURN_ALL_DESC"
-          value="1"
-      />
+        <field name="media_directory" type="text" label="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_LABEL" description="COM_IMAGELINKER_CONFIG_MEDIA_DIRECTORY_DESCRIPTION" default="images" filter="path" size="50" />
+        <field name="only_img" type="radio" label="COM_IMAGELINKER_ONLY_IMG" description="COM_IMAGELINKER_ONLY_IMG_DESC" class="btn-group btn-group-yesno" default="1">
+            <option value="1">JYES</option>
+            <option value="0">JNO</option>
+        </field>
+        <field name="return_all" type="checkbox" label="COM_IMAGELINKER_RETURN_ALL" description="COM_IMAGELINKER_RETURN_ALL_DESC" value="1" />
     </fieldset>
-    
     <fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
     </fieldset>
 </config>
